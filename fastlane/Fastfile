@@ -1,0 +1,40 @@
+fastlane_version "2.59.0"
+
+default_platform :ios
+
+
+
+scheme = "sampleApp"
+ipa_dir = "build"
+
+platform :ios do
+  before_all do
+  end
+
+
+  lane :beta do |options|
+    cocoapods
+    
+    gym(
+        scheme: scheme,
+        output_name: "#{scheme}.ipa",
+        workspace: "#{scheme}.xcworkspace",
+        export_options: "sampleApp/DevExportOptions.plist", 
+        export_method: "ad-hoc",
+        export_xcargs: "-allowProvisioningUpdates",
+        silent:  true,
+        clean:   true
+    )
+    deploygate(
+        api_token: options[:DEPLOYGATE_API_TOKEN],
+        user:  options[:DEPLOYGATE_USER_NAME],
+        apk: "#{scheme}.ipa",
+        message: "hello"
+        )
+  end
+
+
+  lane :tests do
+    run_tests(scheme: "sampleApp")
+  end
+end
